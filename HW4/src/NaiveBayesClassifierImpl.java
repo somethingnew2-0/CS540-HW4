@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Your implementation of a naive bayes classifier. Please implement all four methods.
@@ -15,19 +14,23 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	@Override
 	public void train(Instance[] trainingData, int v) {
 		this.vocabularySize = v;
-		this.totalProbability = new SpamProbability();
+		this.totalProbability = new SpamProbability("");
 		this.spamProbabilities = new HashMap<String, SpamProbability>(vocabularySize);
 		for (Instance instance : trainingData) {
+//			Set<String> words = new HashSet<String>();
 			for (String word : instance.words) {
 				SpamProbability probability = spamProbabilities.get(word);
 				if (probability == null) {
-					probability = new SpamProbability();
+					probability = new SpamProbability(word);
 					spamProbabilities.put(word, probability);
 				}
-				if(Label.SPAM.equals(instance.label)) {
-					probability.spamCount++;
-				}
-				probability.totalCount++;
+//				if (!words.contains(word)) {
+					if(Label.SPAM.equals(instance.label)) {
+						probability.spamCount++;
+					}
+					probability.totalCount++;
+//					words.add(word);
+//				}
 			}
 			if(Label.SPAM.equals(instance.label)) {
 				totalProbability.spamCount++;
@@ -71,6 +74,13 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 * Print out 5 most informative words.
 	 */
 	public void show_informative_5words() {
-		// Implement
+		PriorityQueue<SpamProbability> maxQueue = new PriorityQueue<SpamProbability>(vocabularySize);
+		for (SpamProbability spamProbability : spamProbabilities.values()) {
+			maxQueue.add(spamProbability);
+		}
+		for (int i = 0; i < 5 && !maxQueue.isEmpty(); i++) {
+			SpamProbability spamProbability = maxQueue.poll();
+			System.out.println(spamProbability.value + " " + spamProbability.informativeness());
+		}
 	}
 }
