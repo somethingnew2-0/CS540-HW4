@@ -5,6 +5,7 @@ import java.util.*;
  */
 
 public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
+	private static final double DELTA = 0.00001;
 	private int vocabularySize;
 	private SpamProbability totalProbability;
 	private Map<String, SpamProbability> spamProbabilities;
@@ -57,7 +58,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 		if (probability == null) {
 			return 0;
 		} else {
-			return (Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))/(double)probability.totalCount;
+			return ((Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))+DELTA)/((double)probability.totalCount + vocabularySize*DELTA);
 		}
 	}
 	
