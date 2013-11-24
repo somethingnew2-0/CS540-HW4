@@ -1,0 +1,19 @@
+V2-----------------------------------------
+
+in HW4.java: System.out.println changed to System.out.format where appropriate
+
+in HW4.java:19: class name changed from HW3 to HW4.
+
+in HW4.java:38: warning message changed from HW3 to HW4.
+
+in HW4.java:54: method call changed from p_l to p_w_given_l
+
+in HW4.java:55: method call changed from p_l to p_w_given_l
+
+in HW4.java:62: change cr.label to prediction
+
+in HW4.java:65: removed parameters from show_informative_5words call
+
+in HW4.java:66: removed second call to show_informative_5words
+
+in HW4.pdf : changed HW3 to HW4 in sections 3.2 and 3.5

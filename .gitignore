@@ -1,3 +1,6 @@
+.metadata/*
+*/.settings/*
+
 *.class
 
 # Package Files #
