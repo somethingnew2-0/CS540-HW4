@@ -1,14 +1,39 @@
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Your implementation of a naive bayes classifier. Please implement all four methods.
  */
 
 public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
+	private int vocabularySize;
+	private SpamProbability totalProbability;
+	private Map<String, SpamProbability> spamProbabilities;
 	/**
 	 * Trains the classifier with the provided training data and vocabulary size
 	 */
 	@Override
 	public void train(Instance[] trainingData, int v) {
-		// Implement		
+		this.vocabularySize = v;
+		this.totalProbability = new SpamProbability();
+		this.spamProbabilities = new HashMap<String, SpamProbability>(vocabularySize);
+		for (Instance instance : trainingData) {
+			for (String word : instance.words) {
+				SpamProbability probability = spamProbabilities.get(word);
+				if (probability == null) {
+					probability = new SpamProbability();
+					spamProbabilities.put(word, probability);
+				}
+				if(Label.SPAM.equals(instance.label)) {
+					probability.spamCount++;
+				}
+				probability.totalCount++;
+			}
+			if(Label.SPAM.equals(instance.label)) {
+				totalProbability.spamCount++;
+			}
+			totalProbability.totalCount++;
+		}		
 	}
 
 	/**
@@ -16,8 +41,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 */
 	@Override
 	public double p_l(Label label) {
-		// Implement
-		return 0;
+		return (Label.SPAM.equals(label)?totalProbability.spamCount:(totalProbability.totalCount-totalProbability.spamCount))/(double)totalProbability.totalCount;
 	}
 
 	/**
@@ -26,8 +50,12 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 */
 	@Override
 	public double p_w_given_l(String word, Label label) {
-		// Implement
-		return 0;
+		SpamProbability probability = spamProbabilities.get(word);
+		if (probability == null) {
+			return 0;
+		} else {
+			return (Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))/(double)probability.totalCount;
+		}
 	}
 	
 	/**
