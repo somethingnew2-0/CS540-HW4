@@ -59,7 +59,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	public double p_w_given_l(String word, Label label) {
 		SpamProbability probability = spamProbabilities.get(word);
 		if (probability == null) {
-			return 0;
+			return DELTA/((double)(Label.SPAM.equals(label)?totalProbability.spamCount:(totalProbability.totalCount-totalProbability.spamCount)) + (vocabularySize*DELTA));
 		} else {
 			return ((Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))+DELTA)/((double)(Label.SPAM.equals(label)?totalProbability.spamCount:(totalProbability.totalCount-totalProbability.spamCount)) + (vocabularySize*DELTA));
 		}
@@ -70,8 +70,12 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 */
 	@Override
 	public Label classify(String[] words) {
-		// Implement
-		return null;
+		double spamArgument = Math.log10(p_l(Label.SPAM)), hamArgument = Math.log10(p_l(Label.HAM));
+		for (String word : words) {
+			spamArgument += Math.log10(p_w_given_l(word, Label.SPAM));
+			hamArgument += Math.log10(p_w_given_l(word, Label.HAM));
+		}		
+		return (spamArgument > hamArgument? Label.SPAM : Label.HAM);
 	}
 	
 	/**
