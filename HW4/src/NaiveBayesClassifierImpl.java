@@ -7,7 +7,7 @@ import java.util.*;
 public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	private static final double DELTA = 0.00001;
 	private int vocabularySize;
-	private SpamProbability totalProbability;
+	private SpamProbability labelProbability, totalProbability;
 	private Map<String, SpamProbability> spamProbabilities;
 	/**
 	 * Trains the classifier with the provided training data and vocabulary size
@@ -15,6 +15,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	@Override
 	public void train(Instance[] trainingData, int v) {
 		this.vocabularySize = v;
+		this.labelProbability = new SpamProbability("");
 		this.totalProbability = new SpamProbability("");
 		this.spamProbabilities = new HashMap<String, SpamProbability>(vocabularySize);
 		for (Instance instance : trainingData) {
@@ -28,15 +29,17 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 //				if (!words.contains(word)) {
 					if(Label.SPAM.equals(instance.label)) {
 						probability.spamCount++;
+						totalProbability.spamCount++;
 					}
 					probability.totalCount++;
+					totalProbability.totalCount++;
 //					words.add(word);
 //				}
 			}
 			if(Label.SPAM.equals(instance.label)) {
-				totalProbability.spamCount++;
+				labelProbability.spamCount++;
 			}
-			totalProbability.totalCount++;
+			labelProbability.totalCount++;
 		}		
 	}
 
@@ -45,7 +48,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 */
 	@Override
 	public double p_l(Label label) {
-		return (Label.SPAM.equals(label)?totalProbability.spamCount:(totalProbability.totalCount-totalProbability.spamCount))/(double)totalProbability.totalCount;
+		return (Label.SPAM.equals(label)?labelProbability.spamCount:(labelProbability.totalCount-labelProbability.spamCount))/(double)labelProbability.totalCount;
 	}
 
 	/**
@@ -58,7 +61,7 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 		if (probability == null) {
 			return 0;
 		} else {
-			return ((Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))+DELTA)/((double)probability.totalCount + vocabularySize*DELTA);
+			return ((Label.SPAM.equals(label)?probability.spamCount:(probability.totalCount-probability.spamCount))+DELTA)/((double)(Label.SPAM.equals(label)?totalProbability.spamCount:(totalProbability.totalCount-totalProbability.spamCount)) + (vocabularySize*DELTA));
 		}
 	}
 	
