@@ -78,13 +78,25 @@ public class NaiveBayesClassifierImpl implements NaiveBayesClassifier {
 	 * Print out 5 most informative words.
 	 */
 	public void show_informative_5words() {
-		PriorityQueue<SpamProbability> maxQueue = new PriorityQueue<SpamProbability>(vocabularySize);
+		PriorityQueue<SpamProbability> maxQueue = new PriorityQueue<SpamProbability>(vocabularySize, new Comparator<SpamProbability>() {
+			@Override
+			public int compare(SpamProbability one, SpamProbability two) {
+				return Double.compare(informativeness(two.value), informativeness(one.value));
+			}
+		});
+		
 		for (SpamProbability spamProbability : spamProbabilities.values()) {
 			maxQueue.add(spamProbability);
 		}
 		for (int i = 0; i < 5 && !maxQueue.isEmpty(); i++) {
 			SpamProbability spamProbability = maxQueue.poll();
-			System.out.println(spamProbability.value + " " + spamProbability.informativeness());
+			System.out.println(spamProbability.value + " " + informativeness(spamProbability.value));
 		}
+	}
+	
+	private double informativeness(String word) {
+		double spamProbability = p_w_given_l(word, Label.SPAM);
+		double hamProbability = p_w_given_l(word, Label.HAM);
+		return Math.max(spamProbability/hamProbability, hamProbability/spamProbability);
 	}
 }
